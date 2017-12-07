@@ -1,0 +1,144 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "title": "Oauth Private API",
+    "contact": {
+      "name": "mars"
+    },
+    "version": "v1"
+  },
+  "basePath": "/private-api/v1/oauth",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "parameters": {
+  },
+  "responses": {
+    "ErrorResponse": {
+      "description": "Error response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "default": "Http status",
+            "type": "string",
+            "format": "int32"
+          },
+          "code": {
+            "description": "Error code",
+            "type": "string"
+          },
+          "message": {
+            "description": "Error message",
+            "type": "string"
+          },
+          "errors": {
+            "description": "Errors",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "description": "field name",
+                  "type": "string"
+                },
+                "code": {
+                  "description": "error code",
+                  "type": "string"
+                },
+                "message": {
+                  "description": "error message",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/authorize": {
+      "post": {
+        "summary": "",
+        "operationId": "Authorize",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "jwt",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "response_type",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "client_id",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "redirect_uri",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationCode"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AuthorizationCode": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "expiresSeconds": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

@@ -22,9 +22,6 @@ class Root extends React.Component {
                     <BrowserRouter>
                         <Route path="/" component={AuthorizePage}/>
                     </BrowserRouter>
-                    <BrowserRouter>
-                        <Route path="/oauth/authorize" component={AuthorizePage}/>
-                    </BrowserRouter>
                 </MuiThemeProvider>
             </Provider>
         );
