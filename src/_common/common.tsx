@@ -1,4 +1,5 @@
 import { isUndefined } from 'util';
+import { AnyAction } from 'redux';
 
 export function  valueOrDefault(s: string|undefined): string {
     return isUndefined(s) ? '' : s;
@@ -14,6 +15,10 @@ export function isNullOrEmpty(s: string|undefined|null): boolean {
     }
 
     return false;
+}
+
+export interface Dispatchable {
+    (dispatch: (action: AnyAction) => void): void;
 }
 
 export function parseQueryString(search: string): Map<string, string> {

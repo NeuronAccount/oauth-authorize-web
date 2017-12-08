@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { apiAuthorize, AuthorizeParams, RootState } from '../redux';
-import { isNullOrEmpty, parseQueryString, valueOrDefault } from '../common/common';
+import { isNullOrEmpty, parseQueryString, valueOrDefault } from '../_common/common';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
+import { AuthorizationCode } from '../api/oauth/gen/api';
 
 interface Props {
-    apiAuthorize(params: AuthorizeParams): (dispatch: (action: AnyAction) => void) => void;
+    authorizationCode: AuthorizationCode;
+
+    apiAuthorize(p: AuthorizeParams): (dispatch: (action: AnyAction) => void) => void;
 }
 
 interface State {
@@ -16,7 +19,6 @@ interface State {
     redirectUri: string;
     scope: string;
     state: string;
-    jwt: string;
 }
 
 interface RequestParamError {
@@ -40,7 +42,6 @@ class AuthorizePage extends React.Component <Props, State> {
             scope: valueOrDefault(query.get('scope')),
             redirectUri: valueOrDefault(query.get('redirect_uri')),
             state: valueOrDefault(query.get('state')),
-            jwt: ''
         };
 
         this.setState(state);
@@ -66,7 +67,7 @@ class AuthorizePage extends React.Component <Props, State> {
         };
     }
 
-    checkRequestParams(query: Map<string, string>): RequestParamError|null {
+    checkRequestParams(query: Map<string, string>): RequestParamError | null {
         const responseType = query.get('response_type');
         if (isNullOrEmpty(responseType)) {
             return this.requestParamError('response_type');
@@ -96,16 +97,16 @@ class AuthorizePage extends React.Component <Props, State> {
     }
 
     msgOnLoginSuccess(jwt: string) {
-        console.log('msgOnLoginSuccess', jwt);
+        const query = this.state.queryParams;
 
         let authorizeParams: AuthorizeParams;
         authorizeParams = {
             jwt: jwt,
-            clientId: '12345',
-            redirectUri: '234',
-            responseType: '34234',
-            scope: '234',
-            state: '23423',
+            clientId: valueOrDefault(query.get('client_id')),
+            redirectUri: valueOrDefault(query.get('redirect_uri')),
+            responseType: valueOrDefault(query.get('response_type')),
+            scope: valueOrDefault(query.get('scope')),
+            state: valueOrDefault(query.get('state')),
         };
 
         this.props.apiAuthorize(authorizeParams);
@@ -271,9 +272,9 @@ class AuthorizePage extends React.Component <Props, State> {
     }
 
     render() {
-        if (this.state.jwt != null && this.state.jwt !== '') {
+        if (this.props.authorizationCode != null && !isNullOrEmpty(this.props.authorizationCode.code)) {
             window.location.href = this.state.redirectUri
-                + '?code=' + this.state.jwt
+                + '?code=' + this.props.authorizationCode.code
                 + '&state=' + this.state.state;
             return;
         }
@@ -289,7 +290,9 @@ class AuthorizePage extends React.Component <Props, State> {
 }
 
 function selectProps(state: RootState) {
-    return {};
+    return {
+        authorizationCode: state.authorizationCode
+    };
 }
 
 export default connect(
