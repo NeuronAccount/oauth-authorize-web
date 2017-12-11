@@ -1,9 +1,9 @@
 import { AnyAction, combineReducers } from 'redux';
-import { AuthorizationCode, DefaultApiFactory } from './api/oauth/gen/api';
+import { AuthorizationCode, DefaultApiFactory } from './api/oauth-private/gen/api';
 import { isUndefined } from 'util';
 import { Dispatchable } from './_common/common';
 
-const oauthApi = DefaultApiFactory(fetch, 'http://127.0.0.1:8085/private-api/v1/oauth' );
+const oauthApi = DefaultApiFactory(fetch, 'http://127.0.0.1:8085/api-private/v1/oauth' );
 
 export interface RootState {
     authorizationCode: AuthorizationCode;

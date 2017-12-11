@@ -8,7 +8,7 @@
     },
     "version": "v1"
   },
-  "basePath": "/private-api/v1/oauth",
+  "basePath": "/api-private/v1/oauth",
   "schemes": [
     "http",
     "https"
@@ -125,6 +125,10 @@
           }
         }
       }
+    },
+    "/clients": {
+    },
+    "/scopes": {
     }
   },
   "definitions": {

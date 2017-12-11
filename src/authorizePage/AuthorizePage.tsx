@@ -3,7 +3,7 @@ import { apiAuthorize, AuthorizeParams, RootState } from '../redux';
 import { isNullOrEmpty, parseQueryString, valueOrDefault } from '../_common/common';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
-import { AuthorizationCode } from '../api/oauth/gen/api';
+import { AuthorizationCode } from '../api/oauth-private/gen/api';
 
 interface Props {
     authorizationCode: AuthorizationCode;
