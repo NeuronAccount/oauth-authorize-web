@@ -56,7 +56,7 @@ export function errorFromResponse(response: {}): Promise<ApiError> {
 }
 
 export interface AuthorizeParams {
-    jwt: string;
+    accountJwt: string;
     responseType: string;
     clientId: string;
     redirectUri: string;

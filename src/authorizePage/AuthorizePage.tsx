@@ -101,7 +101,7 @@ class AuthorizePage extends React.Component <Props, State> {
 
         let authorizeParams: AuthorizeParams;
         authorizeParams = {
-            jwt: jwt,
+            accountJwt: jwt,
             clientId: valueOrDefault(query.get('client_id')),
             redirectUri: valueOrDefault(query.get('redirect_uri')),
             responseType: valueOrDefault(query.get('response_type')),

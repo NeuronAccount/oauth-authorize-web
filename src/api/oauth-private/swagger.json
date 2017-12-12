@@ -78,7 +78,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "jwt",
+            "name": "accountJwt",
             "type": "string",
             "required": true
           },

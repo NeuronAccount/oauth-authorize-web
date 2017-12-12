@@ -80,17 +80,17 @@ export const DefaultApiFetchParamCreator = {
     /**
      *
      * @summary
-     * @param jwt
+     * @param accountJwt
      * @param responseType
      * @param clientId
      * @param redirectUri
      * @param scope
      * @param state
      */
-    authorize(params: {  "jwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any): FetchArgs {
-        // verify required parameter "jwt" is set
-        if (params["jwt"] == null) {
-            throw new Error("Missing required parameter jwt when calling authorize");
+    authorize(params: {  "accountJwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any): FetchArgs {
+        // verify required parameter "accountJwt" is set
+        if (params["accountJwt"] == null) {
+            throw new Error("Missing required parameter accountJwt when calling authorize");
         }
         // verify required parameter "responseType" is set
         if (params["responseType"] == null) {
@@ -115,7 +115,7 @@ export const DefaultApiFetchParamCreator = {
         const baseUrl = `/authorize`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
-            "jwt": params["jwt"],
+            "accountJwt": params["accountJwt"],
             "response_type": params["responseType"],
             "client_id": params["clientId"],
             "redirect_uri": params["redirectUri"],
@@ -142,14 +142,14 @@ export const DefaultApiFp = {
     /**
      *
      * @summary
-     * @param jwt
+     * @param accountJwt
      * @param responseType
      * @param clientId
      * @param redirectUri
      * @param scope
      * @param state
      */
-    authorize(params: { "jwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<AuthorizationCode> {
+    authorize(params: { "accountJwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<AuthorizationCode> {
         const fetchArgs = DefaultApiFetchParamCreator.authorize(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -170,14 +170,14 @@ export class DefaultApi extends BaseAPI {
     /**
      *
      * @summary
-     * @param jwt
+     * @param accountJwt
      * @param responseType
      * @param clientId
      * @param redirectUri
      * @param scope
      * @param state
      */
-    authorize(params: {  "jwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any) {
+    authorize(params: {  "accountJwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any) {
         return DefaultApiFp.authorize(params, options)(this.fetch, this.basePath);
     }
 }
@@ -190,14 +190,14 @@ export const DefaultApiFactory = function (fetch?: FetchAPI, basePath?: string) 
         /**
          *
          * @summary
-         * @param jwt
+         * @param accountJwt
          * @param responseType
          * @param clientId
          * @param redirectUri
          * @param scope
          * @param state
          */
-        authorize(params: {  "jwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any) {
+        authorize(params: {  "accountJwt": string; "responseType": string; "clientId": string; "redirectUri": string; "scope": string; "state": string; }, options?: any) {
             return DefaultApiFp.authorize(params, options)(fetch, basePath);
         },
     };
