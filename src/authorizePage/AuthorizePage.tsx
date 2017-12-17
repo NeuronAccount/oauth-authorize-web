@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { apiAuthorize, AuthorizeParams, RootState } from '../redux';
+import { apiAuthorize, RootState } from '../redux';
 import { isNullOrEmpty, parseQueryString, valueOrDefault } from '../_common/common';
-import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
-import { AuthorizationCode } from '../api/oauth-private/gen/api';
+import { AuthorizationCode, AuthorizeParams } from '../api/oauth-private/gen/api';
+import { Dispatchable } from '../_common/action';
 
 interface Props {
     authorizationCode: AuthorizationCode;
 
-    apiAuthorize(p: AuthorizeParams): (dispatch: (action: AnyAction) => void) => void;
+    apiAuthorize(p: AuthorizeParams): Dispatchable;
 }
 
 interface State {
@@ -138,7 +138,7 @@ class AuthorizePage extends React.Component <Props, State> {
                         }}
                     >
                         <a
-                            href="http://localhost:3003/"
+                            href="http://qq.com"
                             target="_blank"
                             style={{textDecoration: 'none'}}
                         >
@@ -250,7 +250,7 @@ class AuthorizePage extends React.Component <Props, State> {
                     <iframe
                         id={'login-iframe'}
                         style={{width: '480px', height: '400px', border: '0'}}
-                        src={'http://localhost:3001/?fromOrigin=' + window.location.origin}
+                        src={'http://localhost:3001/?fromOrigin=' + encodeURIComponent(window.location.origin)}
                     />
                 </div>
                 <div
@@ -272,11 +272,15 @@ class AuthorizePage extends React.Component <Props, State> {
     }
 
     render() {
-        if (this.props.authorizationCode != null && !isNullOrEmpty(this.props.authorizationCode.code)) {
-            window.location.href = this.state.redirectUri
-                + '?code=' + this.props.authorizationCode.code
-                + '&state=' + this.state.state;
-            return;
+        if (this.props.authorizationCode != null
+            && this.props.authorizationCode.code != null
+            && this.props.authorizationCode.code !== '') {
+            window.location.href =
+                decodeURIComponent(this.state.redirectUri)
+                + '?code=' + encodeURIComponent(this.props.authorizationCode.code)
+                + '&state=' + encodeURIComponent(this.state.state);
+
+            return null;
         }
 
         return (
@@ -296,6 +300,8 @@ function selectProps(state: RootState) {
 }
 
 export default connect(
-    selectProps, {
+    selectProps,
+    {
         apiAuthorize
-    })(AuthorizePage);
+    })
+(AuthorizePage);
