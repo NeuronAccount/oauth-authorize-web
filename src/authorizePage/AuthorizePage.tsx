@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { apiAuthorize, RootState } from '../redux';
-import { isNullOrEmpty, parseQueryString, valueOrDefault } from '../_common/common';
 import { connect } from 'react-redux';
-import { AuthorizationCode, AuthorizeParams } from '../api/oauth-private/gen/api';
 import { Dispatchable } from '../_common/action';
+import { parseQueryString } from '../_common/common';
+import { AuthorizationCode, authorizeParams } from '../api/oauth-private/gen';
+import { apiAuthorize, RootState } from '../redux';
 
 interface Props {
     authorizationCode: AuthorizationCode;
-
-    apiAuthorize(p: AuthorizeParams): Dispatchable;
+    apiAuthorize(p: authorizeParams): Dispatchable;
 }
 
 interface State {
@@ -29,28 +28,16 @@ interface RequestParamError {
 }
 
 class AuthorizePage extends React.Component <Props, State> {
-    componentWillMount() {
+    public componentWillMount() {
         const query = parseQueryString(window.location.search);
 
-        let requestParamError = this.checkRequestParams(query);
-
-        let state: State = {
-            queryParams: query,
-            requestParamError: requestParamError,
-            responseType: valueOrDefault(query.get('response_type')),
-            clientId: valueOrDefault(query.get('client_id')),
-            scope: valueOrDefault(query.get('scope')),
-            redirectUri: valueOrDefault(query.get('redirect_uri')),
-            state: valueOrDefault(query.get('state')),
-        };
-
-        this.setState(state);
+        this.checkRequestParams(query);
 
         window.addEventListener('message', (e: MessageEvent): void => {
             console.log('message', e.data);
 
             switch (e.data.type) {
-                case 'onLoginSuccess':
+                case 'onLoginCallback':
                     return this.msgOnLoginSuccess(e.data.payload);
                 default:
                     return;
@@ -58,61 +45,68 @@ class AuthorizePage extends React.Component <Props, State> {
         });
     }
 
-    requestParamError(paramName: string): RequestParamError {
-        return {
-            paramName: paramName,
+    public requestParamError(paramName: string) {
+        const requestParamError = {
+            paramName,
             errorCode: 'InvalidQueryParam',
             errorMessage: '无效的' + paramName,
             helpLink: 'http://qq.com'
         };
+
+        this.setState({requestParamError});
     }
 
-    checkRequestParams(query: Map<string, string>): RequestParamError | null {
-        const responseType = query.get('response_type');
-        if (isNullOrEmpty(responseType)) {
+    public checkRequestParams(queryParams: Map<string, string>) {
+        const responseType = queryParams.get('response_type');
+        if (!responseType || responseType === '') {
             return this.requestParamError('response_type');
         }
 
-        const clientId = query.get('client_id');
-        if (isNullOrEmpty(clientId)) {
+        const clientId = queryParams.get('client_id');
+        if (!clientId || clientId === '') {
             return this.requestParamError('client_id');
         }
 
-        const scope = query.get('scope');
-        if (isNullOrEmpty(scope)) {
+        const scope = queryParams.get('scope');
+        if (!scope || scope === '') {
             return this.requestParamError('scope');
         }
 
-        const redirectUri = query.get('redirect_uri');
-        if (isNullOrEmpty(redirectUri)) {
+        const redirectUri = queryParams.get('redirect_uri');
+        if (!redirectUri || redirectUri === '') {
             return this.requestParamError('redirect_uri');
         }
 
-        const state = query.get('state');
-        if (isNullOrEmpty(state)) {
+        const state = queryParams.get('state');
+        if (!state || state === '') {
             return this.requestParamError('state');
         }
 
-        return null;
+        this.setState({
+            queryParams,
+            responseType,
+            clientId,
+            scope,
+            redirectUri,
+            state,
+            requestParamError: null
+        });
     }
 
-    msgOnLoginSuccess(jwt: string) {
-        const query = this.state.queryParams;
+    public msgOnLoginSuccess(jwt: string) {
+        const {clientId, redirectUri, responseType, scope, state} = this.state;
 
-        let authorizeParams: AuthorizeParams;
-        authorizeParams = {
+        this.props.apiAuthorize({
             accountJwt: jwt,
-            clientId: valueOrDefault(query.get('client_id')),
-            redirectUri: valueOrDefault(query.get('redirect_uri')),
-            responseType: valueOrDefault(query.get('response_type')),
-            scope: valueOrDefault(query.get('scope')),
-            state: valueOrDefault(query.get('state')),
-        };
-
-        this.props.apiAuthorize(authorizeParams);
+            clientId,
+            redirectUri,
+            responseType,
+            scope,
+            state,
+        });
     }
 
-    renderRequestParamsError(e: RequestParamError) {
+    public renderRequestParamsError(e: RequestParamError) {
         return (
             <div>
                 <div
@@ -154,7 +148,7 @@ class AuthorizePage extends React.Component <Props, State> {
                         </a>
                         <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
                         <a
-                            href="http://localhost:3003/"
+                            href="http://localhost:3002/"
                             target="_blank"
                             style={{textDecoration: 'none'}}
                         >
@@ -174,7 +168,7 @@ class AuthorizePage extends React.Component <Props, State> {
         );
     }
 
-    renderHeader() {
+    public renderHeader() {
         return (
             <div
                 id={'header'}
@@ -228,7 +222,7 @@ class AuthorizePage extends React.Component <Props, State> {
         );
     }
 
-    renderContent() {
+    public renderContent() {
         return (
             <div
                 id={'content'}
@@ -271,7 +265,7 @@ class AuthorizePage extends React.Component <Props, State> {
         );
     }
 
-    render() {
+    public render() {
         if (this.props.authorizationCode != null
             && this.props.authorizationCode.code != null
             && this.props.authorizationCode.code !== '') {
