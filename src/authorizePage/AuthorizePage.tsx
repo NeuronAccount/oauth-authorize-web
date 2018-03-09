@@ -109,7 +109,7 @@ class AuthorizePage extends React.Component <Props, State> {
     private static renderContentRight() {
         return (
             <div style={{width: '240px', float: 'left'}}>
-                <div style={{marginLeft: '32px', marginTop: '32px'}}>
+                <div style={{marginLeft: '48px', marginTop: '32px'}}>
                     <label style={{fontSize: 'small'}}>该网站已有一百万用户登录火星</label>
                 </div>
             </div>
@@ -242,8 +242,6 @@ class AuthorizePage extends React.Component <Props, State> {
     }
 
     private onLoginFrameMessage(e: MessageEvent) {
-        console.log('onLoginFrameMessage', e.data);
-
         switch (e.data.type) {
             case 'onLoginCallback':
                 return this.msgOnLoginSuccess(e.data.payload);
