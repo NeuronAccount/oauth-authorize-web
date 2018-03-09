@@ -1,5 +1,4 @@
 import { AnyAction, combineReducers } from 'redux';
-import { isUndefined } from 'util';
 import { Dispatchable } from './_common/action';
 import {
     AuthorizationCode, authorizeParams, DefaultApiFactory
@@ -23,11 +22,7 @@ export const apiAuthorize = (p: authorizeParams): Dispatchable => (dispatch) => 
         });
 };
 
-function authorizationCode(state: AuthorizationCode, action: AnyAction): AuthorizationCode {
-    if (isUndefined(state)) {
-        return {};
-    }
-
+const authorizationCode = (state: AuthorizationCode= {}, action: AnyAction): AuthorizationCode => {
     switch (action.type) {
         case AUTHORIZE_SUCCESS: {
             return action.payload;
@@ -35,7 +30,7 @@ function authorizationCode(state: AuthorizationCode, action: AnyAction): Authori
         default:
             return state;
     }
-}
+};
 
 export const rootReducer = combineReducers({
     authorizationCode

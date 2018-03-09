@@ -5,9 +5,11 @@ import { parseQueryString } from '../_common/common';
 import { AuthorizationCode, authorizeParams } from '../api/oauth-private/gen';
 import { apiAuthorize, RootState } from '../redux';
 
+const LOGIN_URL = 'http://127.0.0.1:3001';
+
 interface Props {
     authorizationCode: AuthorizationCode;
-    apiAuthorize(p: authorizeParams): Dispatchable;
+    apiAuthorize: (p: authorizeParams) => Dispatchable;
 }
 
 interface State {
@@ -28,24 +30,170 @@ interface RequestParamError {
 }
 
 class AuthorizePage extends React.Component <Props, State> {
+    private static renderHeader() {
+        return (
+            <div style={{width: '100%', height: '48px', backgroundColor: '#444'}}>
+                <div
+                    style={{
+                        marginLeft: 'auto',
+                        marginRight: 'auto',
+                        backgroundColor: '#333',
+                        maxWidth: '721px',
+                    }}
+                >
+                    {AuthorizePage.renderTitle()}
+                    {AuthorizePage.renderHeaderLinks()}
+                </div>
+            </div>
+        );
+    }
+
+    private static renderTitle() {
+        return (
+            <div style={{float: 'left', marginLeft: '25%'}}>
+                <label style={{color: '#FFF', fontSize: '200%'}}>火星登录</label>
+            </div>
+        );
+    }
+
+    private static renderHeaderLinks() {
+        return (
+            <div style={{float: 'right', marginTop: '20px'}}>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    <label style={{color: '#FFF'}}>？火星登录</label>
+                </a>
+                <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    <label style={{color: '#FFF'}}>授权管理</label>
+                </a>
+                <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    <label style={{color: '#FFF'}}>申请接入</label>
+                </a>
+            </div>
+        );
+    }
+
+    private static renderContent() {
+        return (
+            <div style={{marginLeft: 'auto', marginRight: 'auto', backgroundColor: '#333', maxWidth: '721px'}}>
+                {this.renderContentLeft()}
+                {this.renderContentRight()}
+            </div>
+        );
+    }
+
+    private static renderContentLeft() {
+        return (
+            <div style={{width: '420px', float: 'left', borderRight: '1px dotted rgb(227, 227, 227)'}}>
+                <iframe
+                    style={{width: '320px', height: '400px', border: '0', float: 'right', marginRight: '60px'}}
+                    src={LOGIN_URL + '/?fromOrigin=' + encodeURIComponent(window.location.origin)}
+                />
+            </div>
+        );
+    }
+
+    private static renderContentRight() {
+        return (
+            <div style={{width: '240px', float: 'left'}}>
+                <div style={{marginLeft: '32px', marginTop: '32px'}}>
+                    <label style={{fontSize: 'small'}}>该网站已有一百万用户登录火星</label>
+                </div>
+            </div>
+        );
+    }
+
+    private static renderRequestParamsError(e: RequestParamError) {
+        return (
+            <div style={{marginLeft: 'auto', marginRight: 'auto', maxWidth: '721px', paddingTop: '192px'}}>
+                <label style={{textAlign: 'center', display: 'block'}}>
+                    {'请求参数错误：' + e.errorMessage}
+                </label>
+                {AuthorizePage.renderErrorLinks()}
+            </div>
+        );
+    }
+
+    private static renderErrorLinks() {
+        return (
+            <div style={{marginTop: '96px', float: 'right'}}>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    点此报错
+                </a>
+                <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    解决方案
+                </a>
+                <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
+                <a
+                    href="http://localhost:3002/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    注册帐号
+                </a>
+                <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
+                <a
+                    href="https://www.aliyun.com/"
+                    target="_blank"
+                    style={{textDecoration: 'none'}}
+                >
+                    意见反馈
+                </a>
+            </div>
+        );
+    }
+
     public componentWillMount() {
         const query = parseQueryString(window.location.search);
 
+        this.onLoginFrameMessage = this.onLoginFrameMessage.bind(this);
+
         this.checkRequestParams(query);
 
-        window.addEventListener('message', (e: MessageEvent): void => {
-            console.log('message', e.data);
-
-            switch (e.data.type) {
-                case 'onLoginCallback':
-                    return this.msgOnLoginSuccess(e.data.payload);
-                default:
-                    return;
-            }
-        });
+        window.addEventListener('message', this.onLoginFrameMessage);
     }
 
-    public requestParamError(paramName: string) {
+    public render() {
+        const {code} = this.props.authorizationCode;
+        if (code && code !== '') {
+            this.redirect(code);
+            return null;
+        }
+
+        const {requestParamError} = this.state;
+
+        return (
+            <div>
+                {AuthorizePage.renderHeader()}
+                {requestParamError == null ? AuthorizePage.renderContent()
+                    : AuthorizePage.renderRequestParamsError(requestParamError)}
+            </div>
+        );
+    }
+
+    private requestParamError(paramName: string) {
         const requestParamError = {
             paramName,
             errorCode: 'InvalidQueryParam',
@@ -56,7 +204,7 @@ class AuthorizePage extends React.Component <Props, State> {
         this.setState({requestParamError});
     }
 
-    public checkRequestParams(queryParams: Map<string, string>) {
+    private checkRequestParams(queryParams: Map<string, string>) {
         const responseType = queryParams.get('response_type');
         if (!responseType || responseType === '') {
             return this.requestParamError('response_type');
@@ -93,7 +241,18 @@ class AuthorizePage extends React.Component <Props, State> {
         });
     }
 
-    public msgOnLoginSuccess(jwt: string) {
+    private onLoginFrameMessage(e: MessageEvent) {
+        console.log('onLoginFrameMessage', e.data);
+
+        switch (e.data.type) {
+            case 'onLoginCallback':
+                return this.msgOnLoginSuccess(e.data.payload);
+            default:
+                return;
+        }
+    }
+
+    private msgOnLoginSuccess(jwt: string) {
         const {clientId, redirectUri, responseType, scope, state} = this.state;
 
         this.props.apiAuthorize({
@@ -106,196 +265,20 @@ class AuthorizePage extends React.Component <Props, State> {
         });
     }
 
-    public renderRequestParamsError(e: RequestParamError) {
-        return (
-            <div>
-                <div
-                    style={{
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        maxWidth: '721px',
-                    }}
-                >
-                    <div style={{marginTop: '200px'}}>
-                        <label
-                            style={{
-                                textAlign: 'center',
-                                display: 'block',
-                            }}
-                        >
-                            {'请求参数错误：' + e.errorMessage}
-                        </label>
-                    </div>
-                    <div
-                        style={{
-                            marginTop: '100px', float: 'right'
-                        }}
-                    >
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            点此报错
-                        </a>
-                        <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            解决方案
-                        </a>
-                        <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                        <a
-                            href="http://localhost:3002/"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            注册帐号
-                        </a>
-                        <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            意见反馈
-                        </a>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    private redirect(authorizationCode: string) {
+        const {redirectUri, state} = this.state;
 
-    public renderHeader() {
-        return (
-            <div
-                id={'header'}
-                style={{width: '100%', height: '48px', backgroundColor: '#444'}}
-            >
-                <div
-                    id={'header-inner'}
-                    style={{
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        backgroundColor: '#333',
-                        maxWidth: '721px',
-                    }}
-                >
-                    <div
-                        id={'title'}
-                        style={{float: 'left', marginLeft: '25%'}}
-                    >
-                        <label style={{color: '#FFF', fontSize: '200%'}}>火星登录</label>
-                    </div>
-                    <div
-                        id={'links'}
-                        style={{float: 'right', marginTop: '20px'}}
-                    >
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            <label style={{color: '#FFF'}}>？火星登录</label>
-                        </a>
-                        <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            <label style={{color: '#FFF'}}>授权管理</label>
-                        </a>
-                        <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                        <a
-                            href="http://qq.com"
-                            target="_blank"
-                            style={{textDecoration: 'none'}}
-                        >
-                            <label style={{color: '#FFF'}}>申请接入</label>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    public renderContent() {
-        return (
-            <div
-                id={'content'}
-                style={{
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    backgroundColor: '#333',
-                    maxWidth: '721px',
-                }}
-            >
-                <div
-                    id={'content-left'}
-                    style={{
-                        width: '480px',
-                        float: 'left',
-                        borderRight: '1px dotted rgb(227, 227, 227)',
-                    }}
-                >
-                    <iframe
-                        id={'login-iframe'}
-                        style={{width: '480px', height: '400px', border: '0'}}
-                        src={'http://localhost:3001/?fromOrigin=' + encodeURIComponent(window.location.origin)}
-                    />
-                </div>
-                <div
-                    id={'content-right'}
-                    style={{
-                        width: '240px',
-                        float: 'left',
-                    }}
-                >
-                    <div
-                        id={'accredit-panel'}
-                        style={{marginLeft: '32px', marginTop: '30px'}}
-                    >
-                        <label style={{fontSize: 'small'}}>该网站已有一百万用户登录火星</label>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    public render() {
-        if (this.props.authorizationCode != null
-            && this.props.authorizationCode.code != null
-            && this.props.authorizationCode.code !== '') {
-            window.location.href =
-                decodeURIComponent(this.state.redirectUri)
-                + '?code=' + encodeURIComponent(this.props.authorizationCode.code)
-                + '&state=' + encodeURIComponent(this.state.state);
-
-            return null;
-        }
-
-        return (
-            <div>
-                {this.renderHeader()}
-                {this.state.requestParamError == null ? this.renderContent()
-                    : this.renderRequestParamsError(this.state.requestParamError)}
-            </div>
-        );
+        window.location.href =
+            decodeURIComponent(redirectUri)
+            + '?code=' + encodeURIComponent(authorizationCode)
+            + '&state=' + encodeURIComponent(state);
     }
 }
 
-function selectProps(state: RootState) {
-    return {
-        authorizationCode: state.authorizationCode
-    };
-}
+const selectProps = (state: RootState) => ({
+    authorizationCode: state.authorizationCode
+});
 
-export default connect(
-    selectProps,
-    {
-        apiAuthorize
-    })
-(AuthorizePage);
+export default connect(selectProps, {
+    apiAuthorize
+})(AuthorizePage);
