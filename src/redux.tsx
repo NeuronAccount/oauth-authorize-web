@@ -32,6 +32,6 @@ const authorizationCode = (state: AuthorizationCode= {}, action: AnyAction): Aut
     }
 };
 
-export const rootReducer = combineReducers({
+export const rootReducer = combineReducers<RootState>({
     authorizationCode
 });
