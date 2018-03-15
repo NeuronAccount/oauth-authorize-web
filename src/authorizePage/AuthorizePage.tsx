@@ -32,25 +32,18 @@ interface RequestParamError {
 class AuthorizePage extends React.Component <Props, State> {
     private static renderHeader() {
         return (
-            <div style={{width: '100%', height: '48px', backgroundColor: '#444'}}>
-                <div
-                    style={{
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        backgroundColor: '#333',
-                        maxWidth: '721px',
-                    }}
-                >
-                    {AuthorizePage.renderTitle()}
-                    {AuthorizePage.renderHeaderLinks()}
-                </div>
+            <div style={{
+                width: '100%', height: '48px', backgroundColor: '#444',
+            }}>
+                {AuthorizePage.renderTitle()}
+                {AuthorizePage.renderHeaderLinks()}
             </div>
         );
     }
 
     private static renderTitle() {
         return (
-            <div style={{float: 'left', marginLeft: '25%'}}>
+            <div style={{marginLeft: '8px', float: 'left', display: 'block'}}>
                 <label style={{color: '#FFF', fontSize: '200%'}}>火星登录</label>
             </div>
         );
@@ -58,7 +51,7 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderHeaderLinks() {
         return (
-            <div style={{float: 'right', marginTop: '20px'}}>
+            <div style={{marginRight: '8px', float: 'right', display: 'block', marginTop: '24px'}}>
                 <a
                     href="https://www.aliyun.com/"
                     target="_blank"
@@ -88,7 +81,7 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderContent() {
         return (
-            <div style={{marginLeft: 'auto', marginRight: 'auto', backgroundColor: '#333', maxWidth: '721px'}}>
+            <div style={{}}>
                 {this.renderContentLeft()}
                 {this.renderContentRight()}
             </div>
@@ -97,9 +90,15 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderContentLeft() {
         return (
-            <div style={{width: '420px', float: 'left', borderRight: '1px dotted rgb(227, 227, 227)'}}>
+            <div style={{
+                width: '420px',
+                float: 'left' ,
+                borderRightStyle: 'solid',
+                borderRightColor: '#eee',
+                borderRightWidth: '1px'
+            }}>
                 <iframe
-                    style={{width: '320px', height: '400px', border: '0', float: 'right', marginRight: '60px'}}
+                    style={{width: '300px', height: '360px', border: '0', float: 'right', marginRight: '60px'}}
                     src={LOGIN_URL + '/?fromOrigin=' + encodeURIComponent(window.location.origin)}
                 />
             </div>
@@ -108,8 +107,8 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderContentRight() {
         return (
-            <div style={{width: '240px', float: 'left'}}>
-                <div style={{marginLeft: '48px', marginTop: '32px'}}>
+            <div style={{width: '300px', float: 'left'}}>
+                <div style={{marginLeft: '60px', marginTop: '24px'}}>
                     <label style={{fontSize: 'small'}}>该网站已有一百万用户登录火星</label>
                 </div>
             </div>
@@ -118,7 +117,7 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderRequestParamsError(e: RequestParamError) {
         return (
-            <div style={{marginLeft: 'auto', marginRight: 'auto', maxWidth: '721px', paddingTop: '192px'}}>
+            <div style={{paddingTop: '144px'}}>
                 <label style={{textAlign: 'center', display: 'block'}}>
                     {'请求参数错误：' + e.errorMessage}
                 </label>
@@ -129,7 +128,7 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderErrorLinks() {
         return (
-            <div style={{marginTop: '96px', float: 'right'}}>
+            <div style={{marginTop: '96px'}}>
                 <a
                     href="https://www.aliyun.com/"
                     target="_blank"
@@ -185,7 +184,7 @@ class AuthorizePage extends React.Component <Props, State> {
         const {requestParamError} = this.state;
 
         return (
-            <div>
+            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                 {AuthorizePage.renderHeader()}
                 {requestParamError == null ? AuthorizePage.renderContent()
                     : AuthorizePage.renderRequestParamsError(requestParamError)}
