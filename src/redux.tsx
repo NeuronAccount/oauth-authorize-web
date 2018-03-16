@@ -3,8 +3,9 @@ import { Dispatchable } from './_common/action';
 import {
     AuthorizationCode, authorizeParams, DefaultApiFactory
 } from './api/oauth-private/gen';
+import { HOST } from './ENV';
 
-const oauthApi = DefaultApiFactory(undefined, fetch, 'http://127.0.0.1:8085/api-private/v1/oauth');
+const oauthApi = DefaultApiFactory(undefined, fetch, HOST + '/api-private/v1/oauth');
 
 const AUTHORIZE_SUCCESS = 'AUTHORIZE_SUCCESS';
 

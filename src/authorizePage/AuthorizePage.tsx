@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import { Dispatchable } from '../_common/action';
 import { parseQueryString } from '../_common/common';
 import { AuthorizationCode, authorizeParams } from '../api/oauth-private/gen';
+import { HOST } from '../ENV';
 import { apiAuthorize, RootState } from '../redux';
-
-const LOGIN_URL = 'http://127.0.0.1:3001';
 
 interface Props {
     authorizationCode: AuthorizationCode;
@@ -99,7 +98,7 @@ class AuthorizePage extends React.Component <Props, State> {
             }}>
                 <iframe
                     style={{width: '300px', height: '360px', border: '0', float: 'right', marginRight: '60px'}}
-                    src={LOGIN_URL + '/?fromOrigin=' + encodeURIComponent(window.location.origin)}
+                    src={HOST + '/web/accounts/login/?fromOrigin=' + encodeURIComponent(window.location.origin)}
                 />
             </div>
         );
@@ -146,7 +145,7 @@ class AuthorizePage extends React.Component <Props, State> {
                 </a>
                 <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
                 <a
-                    href="http://localhost:3002/"
+                    href={HOST + '/web/accounts/signup'}
                     target="_blank"
                     style={{textDecoration: 'none'}}
                 >
@@ -197,7 +196,7 @@ class AuthorizePage extends React.Component <Props, State> {
             paramName,
             errorCode: 'InvalidQueryParam',
             errorMessage: '无效的' + paramName,
-            helpLink: 'http://qq.com'
+            helpLink: 'https://www.aliyun.com'
         };
 
         this.setState({requestParamError});
