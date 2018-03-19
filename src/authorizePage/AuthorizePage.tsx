@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Dispatchable } from '../_common/action';
 import { parseQueryString } from '../_common/common';
 import { AuthorizationCode, authorizeParams } from '../api/oauth-private/gen';
-import { HOST } from '../ENV';
+import { env } from '../env';
 import { apiAuthorize, RootState } from '../redux';
 
 interface Props {
@@ -98,7 +98,7 @@ class AuthorizePage extends React.Component <Props, State> {
             }}>
                 <iframe
                     style={{width: '300px', height: '360px', border: '0', float: 'right', marginRight: '60px'}}
-                    src={HOST + '/web/accounts/login/?fromOrigin=' + encodeURIComponent(window.location.origin)}
+                    src={env.host + '/web/accounts/login/?fromOrigin=' + encodeURIComponent(window.location.origin)}
                 />
             </div>
         );
@@ -145,7 +145,7 @@ class AuthorizePage extends React.Component <Props, State> {
                 </a>
                 <label>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
                 <a
-                    href={HOST + '/web/accounts/signup'}
+                    href={env.host + '/web/accounts/signup'}
                     target="_blank"
                     style={{textDecoration: 'none'}}
                 >
