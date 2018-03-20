@@ -72,35 +72,21 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderContent() {
         return (
-            <div style={{}}>
-                {this.renderContentLeft()}
-                {this.renderContentRight()}
-            </div>
-        );
-    }
-
-    private static renderContentLeft() {
-        return (
-            <div style={{
-                width: '420px',
-                float: 'left' ,
-                borderRightStyle: 'solid',
-                borderRightColor: '#eee',
-                borderRightWidth: '1px'
-            }}>
+            <div
+                style={{
+                    width: '300px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
                 <iframe
-                    style={{width: '300px', height: '360px', border: '0', float: 'right', marginRight: '60px'}}
-                    src={env.host + '/web/accounts/login/?fromOrigin=' + encodeURIComponent(window.location.origin)}
+                    style={{width: '300px', height: '360px', border: '0', float: 'right'}}
+                    src={env.host + '/web/accounts/login/?fromOrigin='
+                    + encodeURIComponent(window.location.origin)}
                 />
-            </div>
-        );
-    }
-
-    private static renderContentRight() {
-        return (
-            <div style={{width: '300px', float: 'left'}}>
-                <div style={{marginLeft: '60px', marginTop: '24px'}}>
-                    <label style={{fontSize: 'small'}}>该网站已有一百万用户登录火星</label>
+                <div style={{marginTop: '24px'}}>
+                    <label style={{fontSize: '50%', color: '#888'}}>该网站已有一百万用户登录火星</label>
                 </div>
             </div>
         );
@@ -175,7 +161,14 @@ class AuthorizePage extends React.Component <Props, State> {
         const {requestParamError} = this.state;
 
         return (
-            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
                 {AuthorizePage.renderHeader()}
                 {requestParamError == null ? AuthorizePage.renderContent()
                     : AuthorizePage.renderRequestParamsError(requestParamError)}
