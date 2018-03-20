@@ -3,5 +3,5 @@
 NAME="neuron-oauth-authorize-web" \
 VERSION="v1.0.0" \
 PORT=3003 \
-WEB_PATH=/web/oauth/authorize \
+PUBLIC_URL=/web/oauth/authorize \
 neuron-react-release.sh

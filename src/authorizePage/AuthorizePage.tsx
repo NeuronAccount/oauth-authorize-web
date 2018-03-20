@@ -56,14 +56,6 @@ class AuthorizePage extends React.Component <Props, State> {
                     target="_blank"
                     style={{textDecoration: 'none'}}
                 >
-                    <label style={{color: '#FFF'}}>？火星登录</label>
-                </a>
-                <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
-                <a
-                    href="https://www.aliyun.com/"
-                    target="_blank"
-                    style={{textDecoration: 'none'}}
-                >
                     <label style={{color: '#FFF'}}>授权管理</label>
                 </a>
                 <label style={{color: '#FFF'}}>&nbsp;&nbsp;|&nbsp;&nbsp;</label>
