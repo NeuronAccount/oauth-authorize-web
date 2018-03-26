@@ -42,8 +42,8 @@ class AuthorizePage extends React.Component <Props, State> {
 
     private static renderTitle() {
         return (
-            <div style={{marginLeft: '8px', float: 'left', display: 'block'}}>
-                <label style={{color: '#FFF', fontSize: '200%'}}>火星登录</label>
+            <div style={{marginLeft: '8px', float: 'left'}}>
+                <label style={{color: '#FFF', fontSize: '32px'}}>火星登录</label>
             </div>
         );
     }
@@ -86,7 +86,7 @@ class AuthorizePage extends React.Component <Props, State> {
                     + encodeURIComponent(window.location.origin)}
                 />
                 <div style={{marginTop: '24px'}}>
-                    <label style={{fontSize: '50%', color: '#888'}}>该网站已有一百万用户登录火星</label>
+                    <label style={{fontSize: '14px', color: '#888'}}>该网站已有一百万用户登录火星</label>
                 </div>
             </div>
         );
