@@ -2,11 +2,13 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatchable } from '../_common/action';
 import { parseQueryString } from '../_common/common';
+import { TextTimestamp } from '../_common/TimedText';
 import { AuthorizationCode, authorizeParams } from '../api/oauth-private/gen';
 import { env } from '../env';
 import { apiAuthorize, RootState } from '../redux';
 
 interface Props {
+    errorMessage: TextTimestamp;
     authorizationCode: AuthorizationCode;
     apiAuthorize: (p: authorizeParams) => Dispatchable;
 }
@@ -92,11 +94,11 @@ class AuthorizePage extends React.Component <Props, State> {
         );
     }
 
-    private static renderRequestParamsError(e: RequestParamError) {
+    private static renderRequestParamsError(errorMessage: string) {
         return (
             <div style={{paddingTop: '144px'}}>
                 <label style={{textAlign: 'center', display: 'block'}}>
-                    {'请求参数错误：' + e.errorMessage}
+                    {'请求参数错误：' + errorMessage}
                 </label>
                 {AuthorizePage.renderErrorLinks()}
             </div>
@@ -158,7 +160,15 @@ class AuthorizePage extends React.Component <Props, State> {
             return null;
         }
 
+        let errMsg = '';
         const {requestParamError} = this.state;
+        if (requestParamError != null) {
+            errMsg = requestParamError.errorMessage;
+        }
+        const {errorMessage} = this.props;
+        if (errorMessage != null && errorMessage.text !== '') {
+            errMsg = errorMessage.text;
+        }
 
         return (
             <div
@@ -170,8 +180,8 @@ class AuthorizePage extends React.Component <Props, State> {
                 }}
             >
                 {AuthorizePage.renderHeader()}
-                {requestParamError == null ? AuthorizePage.renderContent()
-                    : AuthorizePage.renderRequestParamsError(requestParamError)}
+                {errMsg && errMsg !== '' ? AuthorizePage.renderRequestParamsError(errMsg)
+                    : AuthorizePage.renderContent()}
             </div>
         );
     }
@@ -227,13 +237,13 @@ class AuthorizePage extends React.Component <Props, State> {
     private onLoginFrameMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'onLoginCallback':
-                return this.msgOnLoginSuccess(e.data.payload);
+                return this.msgOnLoginCallback(e.data.payload);
             default:
                 return;
         }
     }
 
-    private msgOnLoginSuccess(jwt: string) {
+    private msgOnLoginCallback(jwt: string) {
         const {clientId, redirectUri, responseType, scope, state} = this.state;
 
         this.props.apiAuthorize({
@@ -256,8 +266,9 @@ class AuthorizePage extends React.Component <Props, State> {
     }
 }
 
-const selectProps = (state: RootState) => ({
-    authorizationCode: state.authorizationCode
+const selectProps = (rootState: RootState) => ({
+    errorMessage: rootState.errorMessage,
+    authorizationCode: rootState.authorizationCode
 });
 
 export default connect(selectProps, {

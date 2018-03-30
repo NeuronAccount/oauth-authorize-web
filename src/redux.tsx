@@ -1,5 +1,7 @@
 import { AnyAction, combineReducers } from 'redux';
 import { Dispatchable } from './_common/action';
+import { errorMessageReducer, onApiError } from './_common/redux_error';
+import { TextTimestamp } from './_common/TimedText';
 import {
     AuthorizationCode, authorizeParams, DefaultApiFactory
 } from './api/oauth-private/gen';
@@ -10,6 +12,7 @@ const oauthApi = DefaultApiFactory(undefined, fetch, env.host + '/api-private/v1
 const AUTHORIZE_SUCCESS = 'AUTHORIZE_SUCCESS';
 
 export interface RootState {
+    errorMessage: TextTimestamp;
     authorizationCode: AuthorizationCode;
 }
 
@@ -19,7 +22,7 @@ export const apiAuthorize = (p: authorizeParams): Dispatchable => (dispatch) => 
             dispatch({type: AUTHORIZE_SUCCESS, payload: data});
         })
         .catch((err) => {
-            console.log(err);
+            dispatch(onApiError(err, 'oauthApi.authorize'));
         });
 };
 
@@ -34,5 +37,6 @@ const authorizationCode = (state: AuthorizationCode= {}, action: AnyAction): Aut
 };
 
 export const rootReducer = combineReducers<RootState>({
+    errorMessage: errorMessageReducer,
     authorizationCode
 });
